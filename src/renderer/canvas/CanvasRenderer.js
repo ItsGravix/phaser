@@ -15,6 +15,7 @@ var GetBlendModes = require('./utils/GetBlendModes');
 var ScaleEvents = require('../../scale/events');
 var TextureEvents = require('../../textures/events');
 var TransformMatrix = require('../../gameobjects/components/TransformMatrix');
+var GetTintedCanvas = require('./GetTintedCanvas');
 
 /**
  * @classdesc
@@ -808,7 +809,20 @@ var CanvasRenderer = new Class({
             sprite.mask.preRenderCanvas(this, sprite, camera);
         }
 
-        ctx.drawImage(frame.source.image, frameX, frameY, frameWidth, frameHeight, x, y, frameWidth / res, frameHeight / res);
+        var color = sprite.tintTopLeft;
+
+        if (color !== 0xFFFFFF)
+        {
+            sprite.cachedTint = color;
+
+            sprite.tintedCanvas = GetTintedCanvas(sprite, frame, color);
+
+            ctx.drawImage(sprite.tintedCanvas, 0, 0, frameWidth, frameHeight, x, y, frameWidth / res, frameHeight / res);
+        }
+        else
+        {
+            ctx.drawImage(frame.source.image, frameX, frameY, frameWidth, frameHeight, x, y, frameWidth / res, frameHeight / res);
+        }
 
         if (sprite.mask)
         {

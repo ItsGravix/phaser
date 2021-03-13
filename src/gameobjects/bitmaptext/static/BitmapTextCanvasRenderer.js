@@ -5,6 +5,7 @@
  */
 
 var SetTransform = require('../../../renderer/canvas/utils/SetTransform');
+var GetTintedCanvas = require('../../../renderer/canvas/GetTintedCanvas');
 
 /**
  * Renders this Game Object with the Canvas Renderer to the given Camera.
@@ -166,7 +167,23 @@ var BitmapTextCanvasRenderer = function (renderer, src, camera, parentMatrix)
 
         ctx.scale(scale, scale);
 
-        ctx.drawImage(image, glyphX, glyphY, glyphW, glyphH, 0, 0, glyphW, glyphH);
+        var color = src.tintTopLeft;
+
+        if (color !== 0xFFFFFF)
+        {
+            if (src.cachedTint !== color)
+            {
+                src.cachedTint = color;
+
+                src.tintedCanvas = GetTintedCanvas(src, textureFrame, color);
+            }
+
+            ctx.drawImage(src.tintedCanvas, glyphX, glyphY, glyphW, glyphH, 0, 0, glyphW, glyphH);
+        }
+        else
+        {
+            ctx.drawImage(image, glyphX, glyphY, glyphW, glyphH, 0, 0, glyphW, glyphH);
+        }
 
         ctx.restore();
     }
